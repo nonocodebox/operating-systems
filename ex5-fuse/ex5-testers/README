@@ -1,0 +1,44 @@
+=====ReadMe Ex.5=====
+
+Files:
+ioctal.pyc
+tester.pyc
+
+
+Place your tar file in the same directory as the files and type
+in the shell:
+python tester.pyc <Tar file>
+
+The output will be a file with the name "results"
+and will have all the errors.
+
+Error Codes:
+============
+ERROR_1		Checking the files are there
+ERROR_2 	Checking the directories are there
+ERROR_3        	Checking the files in the directories are there
+ERROR_4        	Checking the rename function works
+ERROR_5        	Checking the rename dir function works
+ERROR_6        	Checking the cat function works
+
+ERROR_7        	Checking the cache with the basic file, 
+ERROR_8        	Checking the cache with the large file
+ERROR_9        	Checking that it reads only the last cluster with 'tail' command
+ERROR_10        Checking that if the file name is changed the name in the cash changes as well
+ERROR_11        Checking that if the dir name is changed the name in the cash changes as well
+ERROR_12        Checking that if the timestamp in the cache is updated
+ERROR_13        Checking that the cache handels a lot of small files
+ERROR_14        Checking that the cache handels a lot of large files
+ERROR_15        Checking that the cache handels a lot of large and small files
+ERROR_16        Checking that the cat handels a lot of large files
+ERROR_17        Checking Memory leaks
+
+PREMISSION	Problem with premissions
+FUSE_FAIL	The FUSE system dosen't start
+SIG_FAULT	Segmentation fault
+ERROR_IOCTL	Ioctel problem
+IOCTL_CRASH	The FUSE crashes when calling the Ioctal command
+DOUBLE_LOAD	Loaded same file twice to the cache. 
+BAD_NAME	Bad log or exe name
+NO_FILES	No files were transfered to the mount directory	
+INPUT_ERR	added "/tmp" to the mount address

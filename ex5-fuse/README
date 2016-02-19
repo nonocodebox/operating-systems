@@ -1,0 +1,87 @@
+EX: 5
+
+See ex5.pdf
+
+FILES:
+MyCachingFileSystem.cpp - implementation of a caching file system (for reading files).
+Makefile - a makefile for this exercise.
+README - this file.
+
+
+ANSWERS:
+In order to implement a caching file system we implemented the following (override) functions:
+- caching_read
+  this function is responsible for reading data from an open file, according to the number of
+  bytes requested and the offset in the file.
+  In order to make this function efficient we want to reduce the number of accesses to the disk.
+  This is done by saving the blocks of data read from the file to a cache. The next time that
+  there is a request to access that data, we will search for it in the cache.
+  The cache is implemented as a vector of "blockData" structures ("cacheVector"),
+  which contains the data itself, the file name, the offset in the file, the block size
+  and the last time that the block was accessed to. When there is a request to read a file,
+  we first check if it is in our vector and if it is we return the matching data. Otherwise,
+  we read that data from the disk and save it in the cache.
+  The use of the vector allows us a convenient way to remove and add data to the cache.
+  Our cache uses the LRU algorithm - when the cache reaches its maximum size and we have new
+  data to save, we delete the least recently used block of data from the cache. We use a list
+  ("cacheManager") to manage the order of the blocks: every time that there is an access to a
+  block of data, we move that block to the top of that list. When we need to delete a block from
+  the cache we delete the one in the end of the list. This ensures us the removal of the least
+  recently used block.
+
+- caching_ioctl
+  this function writes the current status of the cache to a log: the time this function was called,
+  and the following information of each block in the cache: it's file name. block number and time
+  it was recently used.
+  The information about every block currently stored in the cache is retrieved from our "cacheVector",
+  which contains the relevant information we need for each block: the time it was recently used,
+  the file name, and the block number (which is calculated according to the offset in the file).
+  We use the function "gettimeofday" to retrieve the dates.
+
+- caching_open
+  this function checks if the open operation is permitted for to given flags. Since our implementation
+  supports read only operations, we check that the given flags and not one of the following:
+  O_CREAT, O_TRUNC, O_APPEND
+  and then open the file for reading.
+  NOTE: this function supports the O_DIRECT and O_SYNC only when we use "#define ENABLE_DIRECT".
+
+- caching_rename
+  this function renames a given file to the given file name. We use the "fullPath" function to get the
+  full path of the given file: the "fullPath" function return the absolute path of a given part name,
+  and the given root directory by using String concatenation.
+  After a file is renamed, all its blocks in the cache are also updated with the new name.
+
+- caching_init
+  This function simply returns the private_data field of fuse_context. This data is initialized in
+  the main function.
+
+- caching_destroy
+  Cleans up the filesystem: releases all the allocated memory from the cache and other global variables,
+  and empties the vector of the cache and the list.
+
+- caching_flush
+  since this function is meant to flush cached data, and our file system is only for reading files,
+  this function does nothing and returns SUCCESS.
+
+- caching_getattr
+  return the attributes of the file, using the "lstat" function.
+
+- caching_fgetattr
+  return the attributes of an open file, using the "fstat" function.
+
+- caching_access
+  checks the file access permissions, using the "access" function.
+
+- caching_release
+  closes an open file. Should be called after there was a call to the "caching_open" function in order
+  to open the given file.
+
+- caching_opendir
+  Opens a directory using the "opendir" function. The full path of the given directory is retrieved
+  from the "fullPath" function.
+
+- caching_readdir
+  reads a directory, ignoring the "offset" parameter and passes zero to the filler function's offset.
+
+- caching_releasedir
+  closes a directory.
