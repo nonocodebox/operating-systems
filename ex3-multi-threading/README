@@ -1,0 +1,68 @@
+EX: 3
+
+See ex3.pdf
+
+FILES:
+outpudevice.cpp - the file that contains the implementation of outpudevice.h.
+                  Contains an implementation of the daemon.
+makefile -        a makefile for this exercise.
+README -          this file.
+
+
+ANSWERS:
+
+Concurrency of Flushing:
+----------------------
+We wanted to have a concurrent running process and therefore we created a background working thread
+(which runs flushBackground(void *args)). This thread flushes the written tasks to the hard disk.
+Thus, enables the concurrency of the program meaning the client threads can ask for service.
+When a client thread calls to flush2device(), it simply waits till the working thread finishes
+writing the requested task. We keep a vector containing the pending tasks to be flushed. When a
+client thread calls write2device(), the calling thread waits till the working thread finishes
+writing the requested task, this is done by verifying the existance of the requested task id.
+
+
+Closing System:
+---------------
+When a client thread calls closedevice() we create a closing thread (which calls to releaseResources()),
+as you can see in the code, releaseResources() de-allocates and resets variables in order to be able to
+start all over again (call initdevice again). We use the closing thread because we want closedevice()
+to be non-blocking: Turning flagCloseSystem on enforces us to wait till the working thread finishes
+this follows writing operations which we would like to avoid. Hence, we create a closing thread
+that does the waiting.
+
+There are three important flags:
+	bool isClosingFinished;
+	bool flagCloseSystem;
+	bool flagShutDown;
+ isClosingFinished -    the working thread has finished writing all pending requests
+ 						(written before closing the system).
+ flagCloseSystem -  indicates one of the client threads has called closedevice().
+ 					[flush2device and howManyWritten can be called],
+                    signals the working thread to cease.
+ flagShutDown - in this stage, one cannot request for any service.
+ wait4close() -  this function waits till the closing thread has finished.
+
+Note that we use file as an indicator for whether initdevice was called.
+
+More about the Design:
+----------------------
+
+typedef struct Task {
+	char * buffer;
+	int size;
+	State state;
+} Task;
+
+typedef enum {UNUSED, USED} State;
+
+As we mentioned before we keep a vector containing the pending tasks to be flushed, the vector
+holds pointers to Task.
+
+State - this is an indicator for whether the task id is available.
+
+UNUSED - after we flushed the task we signal it is unused, so this makes the specified task id available.
+USED - in order not to hold the vector's mutex for long periods of time (i.e write system call),
+before releasing the lock we signal the current task id is used, so if other client thread requests the current
+id it can't have it. We write the buffer to the disk and then again we re-aqauire the lock and signal current task
+id is free to use.

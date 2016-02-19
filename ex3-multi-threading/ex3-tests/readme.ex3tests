@@ -1,0 +1,38 @@
+Important Note - READ THIS
+==========================
+
+The tests are not 100% accurate! It is possible that your exercise failed some tests even though it is correctly implemented. However, it is more probable that you incorrectly implemented the locking and signaling mechanisms.
+
+To be able to understand whether the fault is with the tests or you exercise, please read how the automatic tests work and how to use them to examine your code *before* you appeal.
+
+
+How the tests work - overview
+=============================
+
+The automatic tests for ex3 are a bit complicated. In order to check that your implementation behaves correctly in a concurrent setting, the tests simulate very long write times by automatically inserting delay into your write functions. This is done by replacing fwrite with hooked_fwrite, ofstream with hooked_ofstream, fputs with hooked_fputs, etc. in your code. For instance hooked_fwrite calls delay() before calling the actual fwrite to simulate a long write.
+
+*** IMPORTANT ***
+This means that people who used bad writing solutions (basically, everything that involves a loop that writes to the device byte-by-byte, like a loop of fputc, or a loop of ofs << buffer[i]) had their writing code replaced manually to a call to hooked_fwrite.
+Some exercises might've been missed, so make sure that the errors you received don't stem from a loop I missed. To do that, replace the writing loops in your code with a single fwrite (if you use FILE) or with ofstream::write (if you use streams) before you run the tests. ANY OTHER WRITING SOLUTION MIGHT CAUSE THE TESTERS TO FAIL YOUR EXERCISE.
+
+
+Tester structure
+================
+
+tester.py is the main testing file. It does the code replacement (adding hooked_ before functions and classes), compiles your code into a *dynamic* library, and then uses ex3tests.py for the actual tests.
+
+files/hooks.cc,hooks.h are files that tester.py compiles with your code to enable "hooking". You can see how simulated delays are generated in hooks.cc
+
+ex3tests.py holds the actual tests. It loads your library with ctypes, and uses the function set_fwrite_delay to change the simulated delay time, depending on the test it runs.
+
+
+Running
+=======
+
+Create a tmp/ directory in the same directory where tester.py, ex3tests.py, and files/ are. Put your code in tmp/. Run with:
+
+./tester.py --test --dry
+
+Where --test means: test the code in the tmp directory. --dry means: don't write to a grade file; print errors to screen.
+
+A RUNTIME_<testname> error means that the library either hanged for a long time, caused an exception, or called exit() without a good reason when running the test 'testname'.

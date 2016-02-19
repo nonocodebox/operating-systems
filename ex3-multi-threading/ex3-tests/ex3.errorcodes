@@ -1,0 +1,90 @@
+# Special
+no_appeal	+3	No appeals bonus
+good		+0	Something good you did!
+other		-10	A thing worth mentioning that don't have a specific code
+
+# Submission:
+no_logins -2  Bad login names or incorrect login format in README
+one_late	-3	One day late submission.
+two_late	-10	Two days late submission.
+three_late	-25	Three days late submission.
+too_late	-100	Submission too late.
+bad_tar		-3	Bad tarfile.
+bad_readme	-3	Your readme was very lacking or does not follow the guidelines in terms of format or content. Usually means bad format.
+compilation	-60	requested program does not compile, or other problems with compilation.
+compilation_warning -3 Compilation produces warnings
+missing_makefile -5 No makefile submitted.
+# General
+good_readme	+0	Your readme was good! easy to read, to the point, not too long, etc.
+return_values	-5	Not checking return value of system calls.
+input_handling	-5	Wrong input handling
+code_repetition	-5	Code repetition.
+not_pretty 	-5 	Badly looking code (no comments, inconsistent indentation)
+runtime -100 Runtime error.
+
+# Ex3 specific - automatic
+test_simple_init_and_close -10 Your code returned an error when doing a simple initialization.
+RUNTIME_test_simple_init_and_close -11 Your code returned an error when doing a simple initialization.
+
+test_init_close_twice -3 Your code failed doing an initdevice() after a closedevice().
+RUNTIME_test_init_close_twice -4 Your code failed doing an initdevice() after a closedevice().
+
+test_init_close_twice_fast 0 Your code failed doing an initdevice() after a closedevice().
+RUNTIME_test_init_close_twice_fast -1 Your code failed doing an initdevice() after a closedevice().
+
+test_double_init -3 Your code did not return an error when doing 2 consecutive initialisations.
+RUNTIME_test_double_init -4 Your code did not return an error when doing 2 consecutive initialisations.
+
+test_write_before_init -3 Your code did not return an error on calling write2device before initdevice.
+RUNTIME_test_write_before_init -4 Your code did not return an error on calling write2device before initdevice.
+
+test_simple_write -10 Your code fails to perform a basic write, i.e. the written data is incorrect.
+RUNTIME_test_simple_write -11 Your code fails to perform a basic write, i.e. the written data is incorrect.
+
+test_append_to_file -3 Your code returned an error or overwritten a re-opened device (via initdevice) instead of appending to it.
+RUNTIME_test_append_to_file -4 Your code returned an error or overwritten a re-opened device (via initdevice) instead of appending to it.
+
+test_write_and_flush -5 flush2device doesn't return success after a task has already finished writing, or blocks indefinitely when it should not.
+RUNTIME_test_write_and_flush -6 flush2device doesn't return success after a task has already finished writing, or blocks indefinitely when it should not.
+
+test_close_before_write -3 write2device doesn't return an error when called after closedevice.
+RUNTIME_test_close_before_write -4 write2device doesn't return an error when called after closedevice.
+
+test_close_before_flush -2 flush2device should return -1 if there's some problem, like the device being already closed when the call to flush2device is made.
+RUNTIME_test_close_before_flush -3 flush2device should return -1 if there's some problem, like the device being already closed when the call to flush2device is made.
+
+test_flush_illegal_tid -3 when writing a task T, flush2device with illegal task id T+1 doesn't return an error, or it returns an error but the data written by task T to the file is incorrect.
+RUNTIME_test_flush_illegal_tid -4 when writing a task T, flush2device with illegal task id T+1 doesn't return an error, or it returns an error but the data written by task T to the file is incorrect.
+
+test_multiple_threads -6 Multiple thread test failed.
+RUNTIME_test_multiple_threads -7 Multiple thread test failed.
+
+test_multiple_threads_big -4 Multiple thread test with large data failed.
+RUNTIME_test_multiple_threads_big -5 Multiple thread test with large data failed.
+
+test_multiple_threads_many -3 Multiple thread test with random writing time has failed.
+RUNTIME_test_multiple_threads_many -4 Multiple thread test with random writing time has failed.
+
+test_close_while_flushing -4 Incorrect behavior when calling closedevice while another thread is flushing.
+RUNTIME_test_close_while_flushing -5 Incorrect behavior when calling closedevice while another thread is flushing.
+
+test_write2device_blocking -30 write2device is blocking.
+RUNTIME_test_write2device_blocking -30 write2device is blocking.
+
+test_write2device_blocking_with_2_tasks -15 Previous writing tasks block write2device, probably because the call to fwrite is inside a lock that guards the task queue. This misses the main point of the exercise.
+RUNTIME_test_write2device_blocking_with_2_tasks -16 Previous writing tasks block write2device, probably because the call to fwrite is inside a lock that guards the task queue. This misses the main point of the exercise.
+
+test_flush2device_not_blocking -15 flush2device is not blocking on long writes.
+RUNTIME_test_flush2device_not_blocking -16 flush2device is not blocking on long writes.
+
+test_was_it_written -5 wasItWritten returns incorrect answer, either before the task was written, or after.
+RUNTIME_test_was_it_written -6 wasItWritten returns incorrect answer, either before the task was written, or after.
+
+test_flush2device_waits_for_correct_task -7 flush2device does not wait for the specific task id provided.
+RUNTIME_test_flush2device_waits_for_correct_task -8 flush2device does not wait for the specific task id provided.
+
+review_write2device_no_lock_before_status_check -4 In write2device, you check the status of the device without acquiring a lock or you acquire a lock but for a shorter context than required - e.g. you acquire a lock only to check the state and then you immediately release the lock. If write2device is preempted right after this check, the state of the device can be changed AFTER write2device checked the state, but BEFORE a task was actually added, which leads to write2device returning SUCCESS but the write is never executed, or some other, similar, undefined behavior.
+
+review_flush2device_busywait -7 You implemented flush2device using a busy wait. A busy wait is a non-blocking operation since it doesn't perform any operations that can make the scheduler put the calling thread to sleep (actions like IO or waiting on a condition). Flush2device should block (that is, sleep using a synchronization mechanism) while it is waiting for the write operation to finish. Please note the just using sleep() is incorrect since it is not a synchronization mechanism.
+
+
