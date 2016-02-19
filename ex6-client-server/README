@@ -1,0 +1,55 @@
+EX: 6
+
+See ex6.pdf
+
+FILES:
+srftp.cpp - server main
+clftp.cpp - client main
+Makefile -  a makefile for this exercise.
+README -    this file.
+
+-------
+ANSWERS:
+-------
+1. In order to impelement reliable file transfer protocol over UDP version of the excercise,
+   we would make the following changes:
+   - We would want to know the right order of the data that we recieve (as server) and in order to
+     to that we can add headers to each packets we send (as clients) indicating its place.
+   - We would also need to split the file data (or any other large data we send) to a size smaller
+     than the packet size and add an header indicating the order of the packets (the data with the
+     header together are in packet size).
+
+   When the server recieves the packets, it sorts them in their right order according to the header.
+   If it sees that the is a packet missing, it sends a message to the client with a request to send
+   the data again.
+   Once the server recived all packets it sends an ack to the client, indicating the client should
+   stop sending. Otherwise the server requests the missing packet by its id.
+   Note that this means that the server also sends data to the clients, and the clients also recieve
+   data from the server.
+
+
+2. Graph results
+   -------------
+   We can see crystal clear that for large file sizes (>= 100kB) when the server and the client are
+   running on the same computer the transfer time is faster. For smaller files there isn't any
+   noticable difference.
+   Also, when the client sends bigger files the transer time is increased respectively in both cases
+   (when the server and the client are running on different computers, and when they are running on
+   the same computer).
+
+   Note: we left the time measurement code lines in the implementation with a #define to enable them
+   (#define MEASURE_PERFORMANCE) which is currently disabled.
+
+
+   _______________          |*\_/*|________
+  |  ___________  |        ||_/-\_|______  |
+  | |           | |        | |           | |
+  | |   0   0   | |        | |   0   0   | |
+  | |     -     | |        | |     -     | |
+  | |   \___/   | |        | |   \___/   | |
+  | |___     ___| |        | |___________| |
+  |_____|\_/|_____|        |_______________|
+    _|__|/ \|_|_.............._|________|_
+   / ********** \            / ********** \
+ /  ************  \        /  ************  \
+--------------------      --------------------
